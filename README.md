@@ -3,6 +3,9 @@
 An isolated, static interaction prototype for the Outsmart Free Form basketball
 reward concept.
 
+**Public prototype:**
+<https://outsmart-college.github.io/freeform-basketball-prototype/>
+
 ## GitHub Pages
 
 The public site is deployed from `site/` by
