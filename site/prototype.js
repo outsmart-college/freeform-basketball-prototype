@@ -1,0 +1,297 @@
+const answerForm = document.querySelector('#answer-form');
+const answerInput = document.querySelector('#answer');
+const feedbackMessage = document.querySelector('#feedback-message');
+const equation = document.querySelector('#equation');
+const equationLeft = document.querySelector('#equation-left');
+const equationRight = document.querySelector('#equation-right');
+const rewardLayer = document.querySelector('#reward-layer');
+const primaryXp = document.querySelector('.xp-pop');
+const successToast = document.querySelector('#success-toast');
+const progressTrack = document.querySelector('.progress-track');
+const checkButton = document.querySelector('#check-answer');
+const previewButton = document.querySelector('#preview-reward');
+const resetButton = document.querySelector('#reset-prototype');
+const epicFinale = document.querySelector('#epic-finale');
+
+const problems = [
+  {
+    answer: 5,
+    ariaLabel: '3 x plus 5 equals 20',
+    left: '3<em>x</em> + 5',
+    right: '20',
+  },
+  {
+    answer: 6,
+    ariaLabel: '4 x minus 4 equals 20',
+    left: '4<em>x</em> − 4',
+    right: '20',
+  },
+  {
+    answer: 7,
+    ariaLabel: '2 x plus 3 equals 17',
+    left: '2<em>x</em> + 3',
+    right: '17',
+  },
+];
+
+const scoringClasses = [
+  'is-scoring',
+  'is-scoring-second',
+  'is-scoring-third',
+];
+const lateCorrectClasses = [
+  'is-late-correct-first',
+  'is-late-correct-second',
+  'is-late-correct-third',
+];
+const missedClasses = [
+  'is-missed-first',
+  'is-missed-second',
+  'is-missed-third',
+];
+
+const maxAttemptsPerProblem = 3;
+const firstRewardDurationMs = 2300;
+const bonusRewardDurationMs = 2800;
+const missedRewardDurationMs = 2200;
+let currentProblemIndex = 0;
+let firstTrySolveCount = 0;
+let attemptCount = 0;
+let awaitingNextProblem = false;
+let roundComplete = false;
+let rewardTimeout;
+
+function hideEpicFinale() {
+  epicFinale.classList.remove('is-visible');
+  epicFinale.classList.remove('has-spare-ball-bonus');
+  progressTrack.classList.remove('is-spare-ball-bonus');
+  epicFinale.setAttribute('aria-hidden', 'true');
+}
+
+function showEpicFinale(showSpareBallBonus = false) {
+  hideEpicFinale();
+  epicFinale.classList.toggle('has-spare-ball-bonus', showSpareBallBonus);
+  progressTrack.classList.toggle('is-spare-ball-bonus', showSpareBallBonus);
+  void epicFinale.offsetWidth;
+  void progressTrack.offsetWidth;
+  epicFinale.setAttribute('aria-hidden', 'false');
+  epicFinale.classList.add('is-visible');
+}
+
+function clearReward() {
+  window.clearTimeout(rewardTimeout);
+  rewardLayer.classList.remove('is-playing');
+  rewardLayer.classList.remove('is-missed');
+  checkButton.disabled = false;
+}
+
+function setPrimaryXpLabel(label) {
+  primaryXp.textContent = label;
+  primaryXp.dataset.label = label;
+}
+
+function showStandardSuccess() {
+  successToast.classList.remove('is-visible');
+  void successToast.offsetWidth;
+  successToast.classList.add('is-visible');
+}
+
+function hasEarnedRoundGoal() {
+  return firstTrySolveCount >= 2;
+}
+
+function canStillEarnRoundGoal() {
+  const remainingProblemCount = problems.length - currentProblemIndex - 1;
+  return firstTrySolveCount + remainingProblemCount >= 2;
+}
+
+function finishCurrentProblem() {
+  const wonRound = hasEarnedRoundGoal();
+  const goalIsOutOfReach = !canStillEarnRoundGoal();
+  const usedFinalAttempt = currentProblemIndex === problems.length - 1;
+
+  roundComplete = wonRound || goalIsOutOfReach || usedFinalAttempt;
+  awaitingNextProblem = true;
+  checkButton.disabled = false;
+  checkButton.textContent = roundComplete
+    ? 'Replay prototype'
+    : 'Next problem';
+}
+
+function playCorrectAnswerReward(isFirstTry) {
+  const completesRound = hasEarnedRoundGoal();
+  const includesBonus = completesRound && isFirstTry;
+  const earnedSpareBallBonus = completesRound && currentProblemIndex === 1;
+  const milestoneClass = isFirstTry
+    ? scoringClasses[currentProblemIndex]
+    : lateCorrectClasses[currentProblemIndex];
+  const rewardDurationMs = includesBonus
+    ? bonusRewardDurationMs
+    : firstRewardDurationMs;
+
+  clearReward();
+  hideEpicFinale();
+  successToast.classList.remove('is-visible');
+  rewardLayer.classList.toggle('has-bonus', includesBonus);
+  setPrimaryXpLabel(isFirstTry ? '+20 XP' : '+5 XP');
+  checkButton.disabled = true;
+
+  progressTrack.classList.remove(milestoneClass);
+
+  // Reflow allows the reward and progress timelines to replay in place.
+  void rewardLayer.offsetWidth;
+  void progressTrack.offsetWidth;
+  rewardLayer.classList.add('is-playing');
+  showStandardSuccess();
+
+  progressTrack.classList.add(milestoneClass);
+
+  rewardTimeout = window.setTimeout(() => {
+    rewardLayer.classList.remove('is-playing');
+    if (completesRound) {
+      showEpicFinale(earnedSpareBallBonus);
+    }
+    finishCurrentProblem();
+  }, rewardDurationMs);
+}
+
+function playWrongAnswerReward(isFinalAttempt) {
+  const missedClass = missedClasses[currentProblemIndex];
+
+  clearReward();
+  hideEpicFinale();
+  successToast.classList.remove('is-visible');
+  rewardLayer.classList.remove('has-bonus');
+  checkButton.disabled = true;
+
+  if (isFinalAttempt) {
+    progressTrack.classList.remove(missedClass);
+  }
+  void rewardLayer.offsetWidth;
+  void progressTrack.offsetWidth;
+  rewardLayer.classList.add('is-missed');
+  if (isFinalAttempt) {
+    progressTrack.classList.add(missedClass);
+  }
+
+  rewardTimeout = window.setTimeout(() => {
+    rewardLayer.classList.remove('is-missed');
+    if (isFinalAttempt) {
+      finishCurrentProblem();
+    } else {
+      checkButton.disabled = false;
+      checkButton.textContent = 'Check answer';
+      answerInput.focus();
+      answerInput.select();
+    }
+  }, missedRewardDurationMs);
+}
+
+function playMilestoneIntro() {
+  progressTrack.classList.remove('is-entering');
+  void progressTrack.offsetWidth;
+  progressTrack.classList.add('is-entering');
+}
+
+function loadProblem(index) {
+  const problem = problems[index];
+  currentProblemIndex = index;
+  attemptCount = 0;
+  awaitingNextProblem = false;
+  answerInput.value = '';
+  feedbackMessage.textContent = '';
+  successToast.classList.remove('is-visible');
+  hideEpicFinale();
+  equation.setAttribute('aria-label', problem.ariaLabel);
+  equationLeft.innerHTML = problem.left;
+  equationRight.textContent = problem.right;
+  checkButton.disabled = false;
+  checkButton.textContent = 'Check answer';
+  answerInput.focus();
+
+  if (index === 0) {
+    playMilestoneIntro();
+  }
+}
+
+function resetPrototype() {
+  clearReward();
+  firstTrySolveCount = 0;
+  roundComplete = false;
+  rewardLayer.classList.remove('has-bonus');
+  scoringClasses.forEach((className) => progressTrack.classList.remove(className));
+  lateCorrectClasses.forEach((className) => progressTrack.classList.remove(className));
+  missedClasses.forEach((className) => progressTrack.classList.remove(className));
+  setPrimaryXpLabel('+20 XP');
+  loadProblem(0);
+}
+
+answerForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  if (awaitingNextProblem) {
+    if (!roundComplete && currentProblemIndex < problems.length - 1) {
+      loadProblem(currentProblemIndex + 1);
+    } else {
+      resetPrototype();
+    }
+    return;
+  }
+
+  if (checkButton.disabled) {
+    return;
+  }
+
+  attemptCount += 1;
+  const answer = Number(answerInput.value);
+  const isCorrect = answerInput.value.trim() !== ''
+    && answer === problems[currentProblemIndex].answer;
+
+  if (!isCorrect) {
+    const isFinalAttempt = attemptCount >= maxAttemptsPerProblem;
+    const attemptsRemaining = maxAttemptsPerProblem - attemptCount;
+    const endsRound = isFinalAttempt && (
+      !canStillEarnRoundGoal()
+      || currentProblemIndex === problems.length - 1
+    );
+    successToast.classList.remove('is-visible');
+    feedbackMessage.textContent = isFinalAttempt
+      ? (endsRound
+        ? 'Not quite—that ends this round.'
+        : 'Not quite—move on to the next problem.')
+      : `Not quite—${attemptsRemaining} ${attemptsRemaining === 1 ? 'attempt' : 'attempts'} left.`;
+    playWrongAnswerReward(isFinalAttempt);
+    return;
+  }
+
+  feedbackMessage.textContent = '';
+  const isFirstTry = attemptCount === 1;
+  if (isFirstTry) {
+    firstTrySolveCount += 1;
+  }
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    playCorrectAnswerReward(isFirstTry);
+  } else {
+    const milestoneClass = isFirstTry
+      ? scoringClasses[currentProblemIndex]
+      : lateCorrectClasses[currentProblemIndex];
+    progressTrack.classList.add(milestoneClass);
+    setPrimaryXpLabel(isFirstTry ? '+20 XP' : '+5 XP');
+    showStandardSuccess();
+    finishCurrentProblem();
+  }
+});
+
+previewButton.addEventListener('click', () => {
+  playCorrectAnswerReward(true);
+});
+resetButton.addEventListener('click', resetPrototype);
+
+document.addEventListener('keydown', (event) => {
+  if (event.key.toLowerCase() === 'r' && (event.metaKey || event.ctrlKey)) {
+    event.preventDefault();
+    resetPrototype();
+  }
+});
+
+loadProblem(0);

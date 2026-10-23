@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta
+      name="description"
+      content="An isolated Outsmart Free Form basketball reward prototype."
+    />
+    <link rel="icon" type="image/png" href="./assets/basketball-ball.png" />
+    <title>Free Form — First-Try Basketball Reward — Version B</title>
+    <link rel="stylesheet" href="./styles.css?v=two-yellow-goal-v2" />
+  </head>
+  <body>
+    <main class="prototype-shell">
+      <section class="prototype-notes" aria-labelledby="prototype-title">
+        <p class="eyebrow">Isolated concept prototype · Version B</p>
+        <h1 id="prototype-title">First-try swish</h1>
+        <p>
+          Earn two first-attempt solves across three problems to advance. Each
+          problem allows three attempts. First-try solves earn
+          <strong>+20 XP</strong>; later solves earn <strong>+5 XP</strong>.
+        </p>
+
+        <div class="prototype-controls">
+          <button class="secondary-button" id="preview-reward" type="button">
+            Preview reward
+          </button>
+          <button class="text-button" id="reset-prototype" type="button">
+            Reset question
+          </button>
+        </div>
+
+        <dl class="behavior-list">
+          <div>
+            <dt>Trigger</dt>
+            <dd>Every submitted attempt</dd>
+          </div>
+          <div>
+            <dt>Duration</dt>
+            <dd>1.8–2.2 seconds</dd>
+          </div>
+          <div>
+            <dt>Interaction</dt>
+            <dd>Does not block the screen</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="phone" aria-label="Free Form exercise prototype">
+        <div class="phone-speaker" aria-hidden="true"></div>
+        <div class="app-screen">
+          <div class="free-form-experience" id="free-form-experience">
+          <header class="app-header">
+            <button class="icon-button" type="button" aria-label="Go back">‹</button>
+            <div
+              class="progress-track"
+              aria-label="Three basketball milestones"
+              role="img"
+            >
+              <span class="progress-basketball" aria-hidden="true"></span>
+              <span class="progress-basketball" aria-hidden="true"></span>
+              <span class="progress-basketball" aria-hidden="true"></span>
+            </div>
+            <button class="icon-button close-button" type="button" aria-label="Close">×</button>
+          </header>
+
+          <div class="exercise-copy">
+            <p class="question-type">Free Form</p>
+            <h2>Solve for <em>x</em></h2>
+            <p class="question-support">Show what you know.</p>
+          </div>
+
+          <div class="equation" id="equation" aria-label="3 x plus 5 equals 20">
+            <span id="equation-left">3<em>x</em> + 5</span>
+            <span>=</span>
+            <span id="equation-right">20</span>
+          </div>
+
+          <form class="answer-form" id="answer-form">
+            <label for="answer">Your answer</label>
+            <div class="answer-field">
+              <span><em>x</em> =</span>
+              <input
+                id="answer"
+                name="answer"
+                type="number"
+                inputmode="decimal"
+                autocomplete="off"
+                aria-describedby="feedback-message"
+                placeholder="?"
+              />
+            </div>
+            <p class="feedback-message" id="feedback-message" aria-live="polite"></p>
+          </form>
+
+          <div class="app-actions">
+            <button class="check-button" id="check-answer" form="answer-form" type="submit">
+              Check answer
+            </button>
+          </div>
+
+          <div class="reward-layer" id="reward-layer" aria-hidden="true">
+            <div class="reward-glow"></div>
+            <div class="reward-stage">
+              <img
+                class="hoop-asset"
+                src="./assets/basketball-hoop.png"
+                alt=""
+                draggable="false"
+              />
+              <img
+                class="hands-ball-asset"
+                src="./assets/basketball-hands.png"
+                alt=""
+                draggable="false"
+              />
+              <div class="flight-ball flight-ball-front" aria-hidden="true">
+                <img src="./assets/basketball-ball.png" alt="" draggable="false" />
+              </div>
+              <div class="flight-ball flight-ball-back" aria-hidden="true">
+                <img src="./assets/basketball-ball.png" alt="" draggable="false" />
+              </div>
+
+              <div class="asset-spark asset-spark-one">✦</div>
+              <div class="asset-spark asset-spark-two">✦</div>
+              <div class="asset-spark asset-spark-three">✦</div>
+              <div class="asset-spark asset-spark-four">✦</div>
+              <div class="asset-spark asset-spark-five">✦</div>
+              <div class="asset-spark asset-spark-six">✦</div>
+              <div class="asset-spark asset-spark-seven">✦</div>
+              <div class="asset-spark asset-spark-eight">✦</div>
+              <div class="asset-spark asset-spark-nine">✦</div>
+              <div class="asset-spark asset-spark-ten">✦</div>
+            </div>
+            <div class="xp-drift">
+              <div class="xp-pop" data-label="+20 XP">+20 XP</div>
+            </div>
+            <div class="bonus-xp-drift">
+              <div class="bonus-xp-pop" data-label="+15 Bonus XP">+15 Bonus XP</div>
+            </div>
+            <div class="try-again-callout" aria-hidden="true">
+              <div class="try-again-pop" data-label="Try again">Try again</div>
+            </div>
+          </div>
+
+          <div class="epic-finale" id="epic-finale" role="status" aria-hidden="true">
+            <div class="epic-finale-glow" aria-hidden="true"></div>
+            <div class="epic-rays" aria-hidden="true"></div>
+            <img
+              class="epic-orb-art"
+              src="./assets/hand-with-orb.png"
+              alt="A hand holding a glowing golden orb"
+              draggable="false"
+            />
+            <div class="epic-label" data-label="EPIC">EPIC</div>
+            <div
+              class="spare-ball-bonus"
+              data-label="Spare ball bonus +10XP"
+            >Spare ball bonus +10XP</div>
+          </div>
+
+          <div class="success-toast" id="success-toast" role="status">
+            <span>✓</span>
+            <strong>Correct!</strong>
+          </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./prototype.js?v=two-yellow-goal-v2"></script>
+  </body>
+</html>
