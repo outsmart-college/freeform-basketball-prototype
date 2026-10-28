@@ -5,6 +5,7 @@ const equation = document.querySelector('#equation');
 const equationLeft = document.querySelector('#equation-left');
 const equationRight = document.querySelector('#equation-right');
 const rewardLayer = document.querySelector('#reward-layer');
+const rewardStage = document.querySelector('.reward-stage');
 const primaryXp = document.querySelector('.xp-pop');
 const successToast = document.querySelector('#success-toast');
 const progressTrack = document.querySelector('.progress-track');
@@ -85,8 +86,24 @@ function clearShotTarget() {
 function setShotTarget(isMiss = false) {
   clearShotTarget();
   rewardLayer.classList.add(rewardTargetClasses[currentProblemIndex]);
-  progressHoops[currentProblemIndex].classList.add('is-shot-target');
-  progressHoops[currentProblemIndex].classList.toggle('is-shot-miss', isMiss);
+  const targetHoop = progressHoops[currentProblemIndex];
+  const targetRect = targetHoop.getBoundingClientRect();
+  const layerRect = rewardLayer.getBoundingClientRect();
+  const stageLeft = (layerRect.width / 2) - 180;
+  const stageTop = (layerRect.height * 0.48) - 265;
+  const targetLeft = targetRect.left + (targetRect.width / 2) - layerRect.left - stageLeft;
+  const targetRimY = targetRect.top + (targetRect.height * 0.66) - layerRect.top;
+  const targetTop = targetRimY - stageTop - 84;
+  const midTargetLeft = 180 + ((targetLeft - 180) * 0.54);
+  const targetScreenX = ((targetRect.left + (targetRect.width / 2) - layerRect.left)
+    / layerRect.width) * 100;
+
+  rewardStage.style.setProperty('--target-left', `${targetLeft}px`);
+  rewardStage.style.setProperty('--mid-target-left', `${midTargetLeft}px`);
+  rewardStage.style.setProperty('--target-top', `${targetTop}px`);
+  rewardLayer.style.setProperty('--target-screen-x', `${targetScreenX}%`);
+  targetHoop.classList.add('is-shot-target');
+  targetHoop.classList.toggle('is-shot-miss', isMiss);
 }
 
 function showEpicFinale(showSpareBallBonus = false) {
