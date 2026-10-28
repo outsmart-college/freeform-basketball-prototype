@@ -8,6 +8,7 @@ const rewardLayer = document.querySelector('#reward-layer');
 const primaryXp = document.querySelector('.xp-pop');
 const successToast = document.querySelector('#success-toast');
 const progressTrack = document.querySelector('.progress-track');
+const progressHoops = [...document.querySelectorAll('.progress-hoop')];
 const checkButton = document.querySelector('#check-answer');
 const previewButton = document.querySelector('#preview-reward');
 const resetButton = document.querySelector('#reset-prototype');
@@ -49,6 +50,11 @@ const missedClasses = [
   'is-missed-second',
   'is-missed-third',
 ];
+const rewardTargetClasses = [
+  'target-first',
+  'target-second',
+  'target-third',
+];
 
 const maxAttemptsPerProblem = 3;
 const firstRewardDurationMs = 2300;
@@ -68,6 +74,21 @@ function hideEpicFinale() {
   epicFinale.setAttribute('aria-hidden', 'true');
 }
 
+function clearShotTarget() {
+  rewardTargetClasses.forEach((className) => rewardLayer.classList.remove(className));
+  progressHoops.forEach((hoop) => {
+    hoop.classList.remove('is-shot-target');
+    hoop.classList.remove('is-shot-miss');
+  });
+}
+
+function setShotTarget(isMiss = false) {
+  clearShotTarget();
+  rewardLayer.classList.add(rewardTargetClasses[currentProblemIndex]);
+  progressHoops[currentProblemIndex].classList.add('is-shot-target');
+  progressHoops[currentProblemIndex].classList.toggle('is-shot-miss', isMiss);
+}
+
 function showEpicFinale(showSpareBallBonus = false) {
   hideEpicFinale();
   epicFinale.classList.toggle('has-spare-ball-bonus', showSpareBallBonus);
@@ -82,6 +103,7 @@ function clearReward() {
   window.clearTimeout(rewardTimeout);
   rewardLayer.classList.remove('is-playing');
   rewardLayer.classList.remove('is-missed');
+  clearShotTarget();
   checkButton.disabled = false;
 }
 
@@ -135,6 +157,7 @@ function playCorrectAnswerReward(isFirstTry) {
   rewardLayer.classList.toggle('has-bonus', includesBonus);
   setPrimaryXpLabel(isFirstTry ? '+20 XP' : '+5 XP');
   checkButton.disabled = true;
+  setShotTarget(false);
 
   progressTrack.classList.remove(milestoneClass);
 
@@ -163,6 +186,7 @@ function playWrongAnswerReward(isFinalAttempt) {
   successToast.classList.remove('is-visible');
   rewardLayer.classList.remove('has-bonus');
   checkButton.disabled = true;
+  setShotTarget(true);
 
   if (isFinalAttempt) {
     progressTrack.classList.remove(missedClass);
