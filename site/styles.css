@@ -241,9 +241,9 @@ button {
 .progress-connector {
   position: relative;
   z-index: 1;
-  width: calc(100% + 2px);
+  width: calc(100% + 18px);
   height: 7px;
-  margin: 0 -1px;
+  margin: 0 -9px;
   overflow: hidden;
   border-radius: 999px;
   background: #d7d3ce;
