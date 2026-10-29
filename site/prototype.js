@@ -153,6 +153,15 @@ function syncPotentialHoops() {
   });
 }
 
+function clearProgressResults() {
+  progressHoops.forEach((hoop) => hoop.classList.remove('is-potential'));
+  scoringClasses.forEach((className) => progressTrack.classList.remove(className));
+  lateCorrectClasses.forEach((className) => progressTrack.classList.remove(className));
+  missedClasses.forEach((className) => progressTrack.classList.remove(className));
+  progressTrack.classList.remove('is-spare-ball-bonus');
+  clearShotTarget();
+}
+
 function hasEarnedRoundGoal() {
   return firstTrySolveCount >= roundGoalSolveCount;
 }
@@ -168,6 +177,9 @@ function finishCurrentProblem() {
   const usedFinalAttempt = currentProblemIndex === problems.length - 1;
 
   roundComplete = wonRound || goalIsOutOfReach || usedFinalAttempt;
+  if (roundComplete && !wonRound) {
+    clearProgressResults();
+  }
   awaitingNextProblem = true;
   checkButton.disabled = false;
   checkButton.textContent = roundComplete
