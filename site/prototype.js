@@ -58,15 +58,19 @@ const rewardTargetClasses = [
 ];
 
 const maxAttemptsPerProblem = 3;
+const roundGoalSolveCount = 2;
+const potentialRevealDelayMs = 900;
 const firstRewardDurationMs = 2300;
 const bonusRewardDurationMs = 2800;
 const missedRewardDurationMs = 2200;
+const problemResults = Array(problems.length).fill(null);
 let currentProblemIndex = 0;
 let firstTrySolveCount = 0;
 let attemptCount = 0;
 let awaitingNextProblem = false;
 let roundComplete = false;
 let rewardTimeout;
+let potentialRevealTimeout;
 
 function hideEpicFinale() {
   epicFinale.classList.remove('is-visible');
@@ -135,13 +139,27 @@ function showStandardSuccess() {
   successToast.classList.add('is-visible');
 }
 
+function syncPotentialHoops() {
+  progressHoops.forEach((hoop) => hoop.classList.remove('is-potential'));
+
+  const successesNeeded = Math.max(0, roundGoalSolveCount - firstTrySolveCount);
+  let potentialCount = 0;
+
+  problemResults.forEach((result, index) => {
+    if (result === null && potentialCount < successesNeeded) {
+      progressHoops[index].classList.add('is-potential');
+      potentialCount += 1;
+    }
+  });
+}
+
 function hasEarnedRoundGoal() {
-  return firstTrySolveCount >= 2;
+  return firstTrySolveCount >= roundGoalSolveCount;
 }
 
 function canStillEarnRoundGoal() {
   const remainingProblemCount = problems.length - currentProblemIndex - 1;
-  return firstTrySolveCount + remainingProblemCount >= 2;
+  return firstTrySolveCount + remainingProblemCount >= roundGoalSolveCount;
 }
 
 function finishCurrentProblem() {
@@ -188,6 +206,7 @@ function playCorrectAnswerReward(isFirstTry) {
 
   rewardTimeout = window.setTimeout(() => {
     rewardLayer.classList.remove('is-playing');
+    syncPotentialHoops();
     if (completesRound) {
       showEpicFinale(earnedSpareBallBonus);
     }
@@ -218,6 +237,8 @@ function playWrongAnswerReward(isFinalAttempt) {
   rewardTimeout = window.setTimeout(() => {
     rewardLayer.classList.remove('is-missed');
     if (isFinalAttempt) {
+      progressTrack.classList.remove(missedClass);
+      syncPotentialHoops();
       finishCurrentProblem();
     } else {
       checkButton.disabled = false;
@@ -229,9 +250,12 @@ function playWrongAnswerReward(isFinalAttempt) {
 }
 
 function playMilestoneIntro() {
+  window.clearTimeout(potentialRevealTimeout);
+  progressHoops.forEach((hoop) => hoop.classList.remove('is-potential'));
   progressTrack.classList.remove('is-entering');
   void progressTrack.offsetWidth;
   progressTrack.classList.add('is-entering');
+  potentialRevealTimeout = window.setTimeout(syncPotentialHoops, potentialRevealDelayMs);
 }
 
 function loadProblem(index) {
@@ -257,7 +281,9 @@ function loadProblem(index) {
 
 function resetPrototype() {
   clearReward();
+  window.clearTimeout(potentialRevealTimeout);
   firstTrySolveCount = 0;
+  problemResults.fill(null);
   roundComplete = false;
   rewardLayer.classList.remove('has-bonus');
   scoringClasses.forEach((className) => progressTrack.classList.remove(className));
@@ -301,12 +327,16 @@ answerForm.addEventListener('submit', (event) => {
         ? 'Not quite—that ends this round.'
         : 'Not quite—move on to the next problem.')
       : `Not quite—${attemptsRemaining} ${attemptsRemaining === 1 ? 'attempt' : 'attempts'} left.`;
+    if (isFinalAttempt) {
+      problemResults[currentProblemIndex] = 'missed';
+    }
     playWrongAnswerReward(isFinalAttempt);
     return;
   }
 
   feedbackMessage.textContent = '';
   const isFirstTry = attemptCount === 1;
+  problemResults[currentProblemIndex] = isFirstTry ? 'first-try' : 'late-correct';
   if (isFirstTry) {
     firstTrySolveCount += 1;
   }
@@ -319,6 +349,7 @@ answerForm.addEventListener('submit', (event) => {
     progressTrack.classList.add(milestoneClass);
     setPrimaryXpLabel(isFirstTry ? '+20 XP' : '+5 XP');
     showStandardSuccess();
+    syncPotentialHoops();
     finishCurrentProblem();
   }
 });

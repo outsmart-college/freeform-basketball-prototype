@@ -5,6 +5,7 @@
   --paper: #f7f3ec;
   --orange: #ff5a0a;
   --orange-dark: #d54100;
+  --pink: #ef3b96;
   --yellow: #ffd429;
   --green: #10a83e;
   --muted: #746d66;
@@ -218,6 +219,11 @@ button {
   height: 48px;
   place-items: center;
   color: #aaa6a1;
+  transition: color 220ms ease;
+}
+
+.progress-hoop.is-potential {
+  color: var(--pink);
 }
 
 .progress-hoop svg {
