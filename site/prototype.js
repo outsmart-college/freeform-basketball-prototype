@@ -46,11 +46,6 @@ const lateCorrectClasses = [
   'is-late-correct-second',
   'is-late-correct-third',
 ];
-const missedClasses = [
-  'is-missed-first',
-  'is-missed-second',
-  'is-missed-third',
-];
 const rewardTargetClasses = [
   'target-first',
   'target-second',
@@ -87,7 +82,7 @@ function clearShotTarget() {
   });
 }
 
-function setShotTarget(isMiss = false) {
+function setShotTarget(isMiss = false, animateTarget = true) {
   clearShotTarget();
   rewardLayer.classList.add(rewardTargetClasses[currentProblemIndex]);
   const targetHoop = progressHoops[currentProblemIndex];
@@ -106,8 +101,10 @@ function setShotTarget(isMiss = false) {
   rewardStage.style.setProperty('--mid-target-left', `${midTargetLeft}px`);
   rewardStage.style.setProperty('--target-top', `${targetTop}px`);
   rewardLayer.style.setProperty('--target-screen-x', `${targetScreenX}%`);
-  targetHoop.classList.add('is-shot-target');
-  targetHoop.classList.toggle('is-shot-miss', isMiss);
+  if (animateTarget) {
+    targetHoop.classList.add('is-shot-target');
+    targetHoop.classList.toggle('is-shot-miss', isMiss);
+  }
 }
 
 function showEpicFinale(showSpareBallBonus = false) {
@@ -157,7 +154,6 @@ function clearProgressResults() {
   progressHoops.forEach((hoop) => hoop.classList.remove('is-potential'));
   scoringClasses.forEach((className) => progressTrack.classList.remove(className));
   lateCorrectClasses.forEach((className) => progressTrack.classList.remove(className));
-  missedClasses.forEach((className) => progressTrack.classList.remove(className));
   progressTrack.classList.remove('is-spare-ball-bonus');
   clearShotTarget();
 }
@@ -227,30 +223,22 @@ function playCorrectAnswerReward(isFirstTry) {
 }
 
 function playWrongAnswerReward(isFinalAttempt) {
-  const missedClass = missedClasses[currentProblemIndex];
-
   clearReward();
   hideEpicFinale();
   successToast.classList.remove('is-visible');
   rewardLayer.classList.remove('has-bonus');
   checkButton.disabled = true;
-  setShotTarget(true);
+  setShotTarget(true, !isFinalAttempt);
 
   if (isFinalAttempt) {
-    progressTrack.classList.remove(missedClass);
+    syncPotentialHoops();
   }
   void rewardLayer.offsetWidth;
-  void progressTrack.offsetWidth;
   rewardLayer.classList.add('is-missed');
-  if (isFinalAttempt) {
-    progressTrack.classList.add(missedClass);
-  }
 
   rewardTimeout = window.setTimeout(() => {
     rewardLayer.classList.remove('is-missed');
     if (isFinalAttempt) {
-      progressTrack.classList.remove(missedClass);
-      syncPotentialHoops();
       finishCurrentProblem();
     } else {
       checkButton.disabled = false;
@@ -300,7 +288,6 @@ function resetPrototype() {
   rewardLayer.classList.remove('has-bonus');
   scoringClasses.forEach((className) => progressTrack.classList.remove(className));
   lateCorrectClasses.forEach((className) => progressTrack.classList.remove(className));
-  missedClasses.forEach((className) => progressTrack.classList.remove(className));
   setPrimaryXpLabel('+20 XP');
   loadProblem(0);
 }

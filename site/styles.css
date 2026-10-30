@@ -301,27 +301,18 @@ button {
     cubic-bezier(0.2, 0.88, 0.28, 1.18) forwards;
 }
 
-.progress-track.is-missed-first .progress-hoop:nth-child(1),
-.progress-track.is-missed-second .progress-hoop:nth-child(3),
-.progress-track.is-missed-third .progress-hoop:nth-child(5) {
-  animation: basketball-milestone-wrong 760ms 1150ms
-    cubic-bezier(0.2, 0.88, 0.28, 1.18) forwards;
-}
-
 .progress-track.is-spare-ball-bonus .progress-hoop:nth-child(5) {
   animation: basketball-milestone-score 760ms 1000ms
     cubic-bezier(0.2, 0.88, 0.28, 1.18) forwards;
 }
 
 .progress-track.is-scoring .progress-connector-one::after,
-.progress-track.is-late-correct-first .progress-connector-one::after,
-.progress-track.is-missed-first .progress-connector-one::after {
+.progress-track.is-late-correct-first .progress-connector-one::after {
   animation: progress-connector-fill 620ms 1360ms ease-out forwards;
 }
 
 .progress-track.is-scoring-second .progress-connector-two::after,
-.progress-track.is-late-correct-second .progress-connector-two::after,
-.progress-track.is-missed-second .progress-connector-two::after {
+.progress-track.is-late-correct-second .progress-connector-two::after {
   animation: progress-connector-fill 620ms 1360ms ease-out forwards;
 }
 
@@ -1163,33 +1154,6 @@ em {
 
   100% {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-@keyframes basketball-milestone-wrong {
-  0% {
-    color: #aaa6a1;
-    transform: scale(1) rotate(0deg);
-  }
-
-  34% {
-    color: #ef3e31;
-    transform: scale(1.42) rotate(7deg);
-  }
-
-  54% {
-    color: #ef3e31;
-    transform: scale(0.88) rotate(-4deg);
-  }
-
-  74% {
-    color: #ef3e31;
-    transform: scale(1.14) rotate(2deg);
-  }
-
-  100% {
-    color: #ef3e31;
     transform: scale(1) rotate(0deg);
   }
 }
