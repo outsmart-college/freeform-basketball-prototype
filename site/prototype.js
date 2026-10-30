@@ -14,6 +14,7 @@ const checkButton = document.querySelector('#check-answer');
 const previewButton = document.querySelector('#preview-reward');
 const resetButton = document.querySelector('#reset-prototype');
 const epicFinale = document.querySelector('#epic-finale');
+const epicLabel = document.querySelector('.epic-label');
 const freeFormExperience = document.querySelector('#free-form-experience');
 const breakIntoStepsButton = document.querySelector('#break-into-steps');
 const questionType = document.querySelector('#question-type');
@@ -92,6 +93,7 @@ let isScaffoldedMode = false;
 function hideEpicFinale() {
   epicFinale.classList.remove('is-visible');
   epicFinale.classList.remove('has-spare-ball-bonus');
+  epicFinale.classList.remove('is-scaffolded-finale');
   progressTrack.classList.remove('is-spare-ball-bonus');
   epicFinale.setAttribute('aria-hidden', 'true');
 }
@@ -155,9 +157,15 @@ function enterScaffoldedMode() {
 }
 
 function showEpicFinale(showSpareBallBonus = false) {
+  const showScaffoldedFinale = isScaffoldedMode;
+  const showBonus = showSpareBallBonus && !showScaffoldedFinale;
+
   hideEpicFinale();
-  epicFinale.classList.toggle('has-spare-ball-bonus', showSpareBallBonus);
-  progressTrack.classList.toggle('is-spare-ball-bonus', showSpareBallBonus);
+  epicLabel.textContent = showScaffoldedFinale ? 'Nice' : 'EPIC';
+  epicLabel.dataset.label = epicLabel.textContent;
+  epicFinale.classList.toggle('is-scaffolded-finale', showScaffoldedFinale);
+  epicFinale.classList.toggle('has-spare-ball-bonus', showBonus);
+  progressTrack.classList.toggle('is-spare-ball-bonus', showBonus);
   void epicFinale.offsetWidth;
   void progressTrack.offsetWidth;
   epicFinale.setAttribute('aria-hidden', 'false');

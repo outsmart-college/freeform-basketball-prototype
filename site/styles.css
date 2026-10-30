@@ -756,6 +756,22 @@ em {
   animation: epic-label-pop 560ms 380ms cubic-bezier(0.18, 1.24, 0.34, 1) both;
 }
 
+.epic-finale.is-scaffolded-finale .epic-finale-glow,
+.epic-finale.is-scaffolded-finale .epic-rays,
+.epic-finale.is-scaffolded-finale .epic-orb-art,
+.epic-finale.is-scaffolded-finale .spare-ball-bonus {
+  display: none;
+}
+
+.epic-finale.is-scaffolded-finale .epic-label {
+  top: 320px;
+}
+
+.epic-finale.is-visible.is-scaffolded-finale .epic-label {
+  animation: scaffolded-nice-pop 620ms
+    cubic-bezier(0.18, 1.24, 0.34, 1) both;
+}
+
 .epic-finale.is-visible.has-spare-ball-bonus .spare-ball-bonus {
   animation: spare-ball-bonus-pop 2500ms 1000ms
     cubic-bezier(0.18, 1.08, 0.34, 1) both;
@@ -1145,6 +1161,23 @@ em {
   0% { opacity: 0; transform: translateY(22px) scale(0.2) rotate(-4deg); }
   65% { opacity: 1; transform: translateY(-4px) scale(1.14) rotate(1deg); }
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+
+@keyframes scaffolded-nice-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.3) rotate(-3deg);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.12) rotate(1deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
 }
 
 @keyframes glow-pop {
