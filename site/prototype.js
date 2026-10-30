@@ -57,7 +57,6 @@ const roundGoalSolveCount = 2;
 const maxMissedProblems = 2;
 const potentialRevealDelayMs = 900;
 const firstRewardDurationMs = 2300;
-const bonusRewardDurationMs = 2800;
 const missedRewardDurationMs = 2200;
 const finalMissFadeDelayMs = 1400;
 const problemResults = Array(problems.length).fill(null);
@@ -195,20 +194,15 @@ function finishCurrentProblem() {
 
 function playCorrectAnswerReward(isFirstTry) {
   const completesRound = hasEarnedRoundGoal();
-  const includesBonus = completesRound && isFirstTry;
   const earnedSpareBallBonus = completesRound && currentProblemIndex === 1;
   const milestoneClass = isFirstTry
     ? scoringClasses[currentProblemIndex]
     : lateCorrectClasses[currentProblemIndex];
-  const rewardDurationMs = includesBonus
-    ? bonusRewardDurationMs
-    : firstRewardDurationMs;
 
   clearReward();
   hideEpicFinale();
   successToast.classList.remove('is-visible');
-  rewardLayer.classList.toggle('has-bonus', includesBonus);
-  setPrimaryXpLabel(isFirstTry ? '+20 XP' : '+5 XP');
+  setPrimaryXpLabel(isFirstTry ? '+10 XP' : '+5 XP');
   checkButton.disabled = true;
   setShotTarget(false);
 
@@ -229,14 +223,13 @@ function playCorrectAnswerReward(isFirstTry) {
       showEpicFinale(earnedSpareBallBonus);
     }
     finishCurrentProblem();
-  }, rewardDurationMs);
+  }, firstRewardDurationMs);
 }
 
 function playWrongAnswerReward(isFinalAttempt) {
   clearReward();
   hideEpicFinale();
   successToast.classList.remove('is-visible');
-  rewardLayer.classList.remove('has-bonus');
   checkButton.disabled = true;
   setShotTarget(true, !isFinalAttempt);
 
@@ -298,10 +291,9 @@ function resetPrototype() {
   firstTrySolveCount = 0;
   problemResults.fill(null);
   roundComplete = false;
-  rewardLayer.classList.remove('has-bonus');
   scoringClasses.forEach((className) => progressTrack.classList.remove(className));
   lateCorrectClasses.forEach((className) => progressTrack.classList.remove(className));
-  setPrimaryXpLabel('+20 XP');
+  setPrimaryXpLabel('+10 XP');
   loadProblem(0);
 }
 
@@ -362,7 +354,7 @@ answerForm.addEventListener('submit', (event) => {
       ? scoringClasses[currentProblemIndex]
       : lateCorrectClasses[currentProblemIndex];
     progressTrack.classList.add(milestoneClass);
-    setPrimaryXpLabel(isFirstTry ? '+20 XP' : '+5 XP');
+    setPrimaryXpLabel(isFirstTry ? '+10 XP' : '+5 XP');
     showStandardSuccess();
     syncPotentialHoops();
     finishCurrentProblem();
