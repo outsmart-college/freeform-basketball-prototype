@@ -228,7 +228,7 @@ button {
 .progress-hoop.is-potential {
   --hoop-opacity: 1;
 
-  color: var(--pink);
+  color: #aaa6a1;
 }
 
 .progress-hoop svg {
