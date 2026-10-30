@@ -54,6 +54,7 @@ const rewardTargetClasses = [
 
 const maxAttemptsPerProblem = 3;
 const roundGoalSolveCount = 2;
+const maxMissedProblems = 2;
 const potentialRevealDelayMs = 900;
 const firstRewardDurationMs = 2300;
 const bonusRewardDurationMs = 2800;
@@ -165,18 +166,24 @@ function hasEarnedRoundGoal() {
   return firstTrySolveCount >= roundGoalSolveCount;
 }
 
-function canStillEarnRoundGoal() {
-  const remainingProblemCount = problems.length - currentProblemIndex - 1;
-  return firstTrySolveCount + remainingProblemCount >= roundGoalSolveCount;
+function hasFailedRound() {
+  return problemResults.filter((result) => result === 'missed').length
+    >= maxMissedProblems;
+}
+
+function hasSolvedEveryProblem() {
+  return problemResults.every((result) => (
+    result === 'first-try' || result === 'late-correct'
+  ));
 }
 
 function finishCurrentProblem() {
   const wonRound = hasEarnedRoundGoal();
-  const goalIsOutOfReach = !canStillEarnRoundGoal();
+  const failedRound = hasFailedRound();
   const usedFinalAttempt = currentProblemIndex === problems.length - 1;
 
-  roundComplete = wonRound || goalIsOutOfReach || usedFinalAttempt;
-  if (roundComplete && !wonRound) {
+  roundComplete = wonRound || failedRound || usedFinalAttempt;
+  if (roundComplete && !wonRound && !hasSolvedEveryProblem()) {
     clearProgressResults();
   }
   awaitingNextProblem = true;
@@ -322,8 +329,11 @@ answerForm.addEventListener('submit', (event) => {
   if (!isCorrect) {
     const isFinalAttempt = attemptCount >= maxAttemptsPerProblem;
     const attemptsRemaining = maxAttemptsPerProblem - attemptCount;
+    const missedProblemCount = problemResults.filter(
+      (result) => result === 'missed',
+    ).length;
     const endsRound = isFinalAttempt && (
-      !canStillEarnRoundGoal()
+      missedProblemCount + 1 >= maxMissedProblems
       || currentProblemIndex === problems.length - 1
     );
     successToast.classList.remove('is-visible');
