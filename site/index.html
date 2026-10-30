@@ -10,12 +10,12 @@
     />
     <link rel="icon" type="image/png" href="./assets/basketball-ball.png" />
     <title>Free Form — First-Try Basketball Reward — Version B</title>
-    <link rel="stylesheet" href="./styles.css?v=rewards-v1" />
+    <link rel="stylesheet" href="./styles.css?v=scaffolded-v1" />
   </head>
   <body>
     <svg class="hoop-symbols" aria-hidden="true">
       <defs>
-        <symbol id="progress-hoop-icon" viewBox="0 0 120 106">
+        <symbol id="progress-backboard-icon" viewBox="0 0 120 106">
           <path
             d="M20 12Q60 2 100 12Q107 14 108 24L109 59Q109 67 102 71Q60 80 18 71Q11 67 12 59L13 24Q14 15 20 12Z"
             fill="currentColor"
@@ -30,32 +30,36 @@
             stroke-width="6"
             stroke-linejoin="round"
           />
-          <path
-            d="M35 69L43 100Q60 106 77 100L85 69M43 70L51 103M53 69L57 105M67 69L63 105M77 70L69 103M39 82L78 98M42 97L82 82"
-            fill="none"
-            stroke="rgb(30 24 20 / 28%)"
-            stroke-width="6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M35 69L43 100Q60 106 77 100L85 69M43 70L51 103M53 69L57 105M67 69L63 105M77 70L69 103M39 82L78 98M42 97L82 82"
-            fill="none"
-            stroke="#fff"
-            stroke-width="3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <ellipse
-            cx="60"
-            cy="68"
-            rx="28"
-            ry="7"
-            fill="#ff5a0a"
-            stroke="#fff"
-            stroke-width="4"
-          />
-          <ellipse cx="60" cy="68" rx="20" ry="3" fill="#c93c00" />
+        </symbol>
+        <symbol id="progress-rim-icon" viewBox="0 0 120 106">
+          <g>
+            <path
+              d="M35 69L43 100Q60 106 77 100L85 69M43 70L51 103M53 69L57 105M67 69L63 105M77 70L69 103M39 82L78 98M42 97L82 82"
+              fill="none"
+              stroke="rgb(30 24 20 / 28%)"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M35 69L43 100Q60 106 77 100L85 69M43 70L51 103M53 69L57 105M67 69L63 105M77 70L69 103M39 82L78 98M42 97L82 82"
+              fill="none"
+              stroke="#fff"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <ellipse
+              cx="60"
+              cy="68"
+              rx="28"
+              ry="7"
+              fill="#ff5a0a"
+              stroke="#fff"
+              stroke-width="4"
+            />
+            <ellipse cx="60" cy="68" rx="20" ry="3" fill="#c93c00" />
+          </g>
         </symbol>
       </defs>
     </svg>
@@ -107,30 +111,47 @@
               role="img"
             >
               <span class="progress-hoop" aria-hidden="true">
-                <svg viewBox="0 0 120 106"><use href="#progress-hoop-icon"></use></svg>
+                <span class="progress-hoop-art">
+                  <svg class="progress-backboard-icon" viewBox="0 0 120 106"><use href="#progress-backboard-icon"></use></svg>
+                  <svg class="progress-rim-icon" viewBox="0 0 120 106"><use href="#progress-rim-icon"></use></svg>
+                </span>
               </span>
               <span class="progress-connector progress-connector-one" aria-hidden="true"></span>
               <span class="progress-hoop" aria-hidden="true">
-                <svg viewBox="0 0 120 106"><use href="#progress-hoop-icon"></use></svg>
+                <span class="progress-hoop-art">
+                  <svg class="progress-backboard-icon" viewBox="0 0 120 106"><use href="#progress-backboard-icon"></use></svg>
+                  <svg class="progress-rim-icon" viewBox="0 0 120 106"><use href="#progress-rim-icon"></use></svg>
+                </span>
               </span>
               <span class="progress-connector progress-connector-two" aria-hidden="true"></span>
               <span class="progress-hoop" aria-hidden="true">
-                <svg viewBox="0 0 120 106"><use href="#progress-hoop-icon"></use></svg>
+                <span class="progress-hoop-art">
+                  <svg class="progress-backboard-icon" viewBox="0 0 120 106"><use href="#progress-backboard-icon"></use></svg>
+                  <svg class="progress-rim-icon" viewBox="0 0 120 106"><use href="#progress-rim-icon"></use></svg>
+                </span>
               </span>
             </div>
             <button class="icon-button close-button" type="button" aria-label="Close">×</button>
           </header>
 
           <div class="exercise-copy">
-            <p class="question-type">Free Form</p>
+            <p class="question-type" id="question-type">Free Form</p>
             <h2>Solve for <em>x</em></h2>
-            <p class="question-support">Show what you know.</p>
+            <p class="question-support" id="question-support">Show what you know.</p>
           </div>
 
           <div class="equation" id="equation" aria-label="3 x plus 5 equals 20">
             <span id="equation-left">3<em>x</em> + 5</span>
             <span>=</span>
             <span id="equation-right">20</span>
+          </div>
+
+          <div class="scaffold-card" id="scaffold-card" aria-live="polite" aria-hidden="true">
+            <p class="scaffold-heading">Break it into steps</p>
+            <ol>
+              <li id="scaffold-step-one"></li>
+              <li id="scaffold-step-two"></li>
+            </ol>
           </div>
 
           <form class="answer-form" id="answer-form">
@@ -151,6 +172,15 @@
           </form>
 
           <div class="app-actions">
+            <button
+              class="break-into-steps-button"
+              id="break-into-steps"
+              type="button"
+              aria-pressed="false"
+            >
+              <span aria-hidden="true">↳</span>
+              Break into steps
+            </button>
             <button class="check-button" id="check-answer" form="answer-form" type="submit">
               Check answer
             </button>
@@ -216,6 +246,6 @@
       </section>
     </main>
 
-    <script src="./prototype.js?v=rewards-v1"></script>
+    <script src="./prototype.js?v=scaffolded-v1"></script>
   </body>
 </html>

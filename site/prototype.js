@@ -14,6 +14,13 @@ const checkButton = document.querySelector('#check-answer');
 const previewButton = document.querySelector('#preview-reward');
 const resetButton = document.querySelector('#reset-prototype');
 const epicFinale = document.querySelector('#epic-finale');
+const freeFormExperience = document.querySelector('#free-form-experience');
+const breakIntoStepsButton = document.querySelector('#break-into-steps');
+const questionType = document.querySelector('#question-type');
+const questionSupport = document.querySelector('#question-support');
+const scaffoldCard = document.querySelector('#scaffold-card');
+const scaffoldStepOne = document.querySelector('#scaffold-step-one');
+const scaffoldStepTwo = document.querySelector('#scaffold-step-two');
 
 const problems = [
   {
@@ -21,18 +28,30 @@ const problems = [
     ariaLabel: '3 x plus 5 equals 20',
     left: '3<em>x</em> + 5',
     right: '20',
+    steps: [
+      'Subtract 5 from both sides: 3x = 15',
+      'Divide both sides by 3.',
+    ],
   },
   {
     answer: 6,
     ariaLabel: '4 x minus 4 equals 20',
     left: '4<em>x</em> − 4',
     right: '20',
+    steps: [
+      'Add 4 to both sides: 4x = 24',
+      'Divide both sides by 4.',
+    ],
   },
   {
     answer: 7,
     ariaLabel: '2 x plus 3 equals 17',
     left: '2<em>x</em> + 3',
     right: '17',
+    steps: [
+      'Subtract 3 from both sides: 2x = 14',
+      'Divide both sides by 2.',
+    ],
   },
 ];
 
@@ -68,6 +87,7 @@ let roundComplete = false;
 let rewardTimeout;
 let finalMissFadeTimeout;
 let potentialRevealTimeout;
+let isScaffoldedMode = false;
 
 function hideEpicFinale() {
   epicFinale.classList.remove('is-visible');
@@ -95,7 +115,8 @@ function setShotTarget(isMiss = false, animateTarget = true) {
   const targetLeft = targetRect.left + (targetRect.width / 2) - layerRect.left - stageLeft;
   const targetRimY = targetRect.top + (targetRect.height * 0.66) - layerRect.top;
   const targetTop = targetRimY - stageTop - 84;
-  const midTargetLeft = 180 + ((targetLeft - 180) * 0.54);
+  const shotTravelRatio = isScaffoldedMode ? 0.82 : 0.54;
+  const midTargetLeft = 180 + ((targetLeft - 180) * shotTravelRatio);
   const targetScreenX = ((targetRect.left + (targetRect.width / 2) - layerRect.left)
     / layerRect.width) * 100;
 
@@ -107,6 +128,30 @@ function setShotTarget(isMiss = false, animateTarget = true) {
     targetHoop.classList.add('is-shot-target');
     targetHoop.classList.toggle('is-shot-miss', isMiss);
   }
+}
+
+function syncDifficultyMode() {
+  freeFormExperience.classList.toggle('is-scaffolded', isScaffoldedMode);
+  rewardLayer.classList.toggle('is-scaffolded-shot', isScaffoldedMode);
+  questionType.textContent = isScaffoldedMode ? 'Scaffolded' : 'Free Form';
+  questionSupport.textContent = isScaffoldedMode
+    ? 'Work through this one step at a time.'
+    : 'Show what you know.';
+  scaffoldCard.setAttribute('aria-hidden', String(!isScaffoldedMode));
+  breakIntoStepsButton.setAttribute('aria-pressed', String(isScaffoldedMode));
+  breakIntoStepsButton.classList.toggle('is-active', isScaffoldedMode);
+  breakIntoStepsButton.innerHTML = isScaffoldedMode
+    ? '<span aria-hidden="true">✓</span> Steps enabled'
+    : '<span aria-hidden="true">↳</span> Break into steps';
+}
+
+function enterScaffoldedMode() {
+  if (isScaffoldedMode || awaitingNextProblem || checkButton.disabled) {
+    return;
+  }
+
+  isScaffoldedMode = true;
+  syncDifficultyMode();
 }
 
 function showEpicFinale(showSpareBallBonus = false) {
@@ -276,6 +321,9 @@ function loadProblem(index) {
   equation.setAttribute('aria-label', problem.ariaLabel);
   equationLeft.innerHTML = problem.left;
   equationRight.textContent = problem.right;
+  scaffoldStepOne.textContent = problem.steps[0];
+  scaffoldStepTwo.textContent = problem.steps[1];
+  syncDifficultyMode();
   checkButton.disabled = false;
   checkButton.textContent = 'Check answer';
   answerInput.focus();
@@ -289,6 +337,7 @@ function resetPrototype() {
   clearReward();
   window.clearTimeout(potentialRevealTimeout);
   firstTrySolveCount = 0;
+  isScaffoldedMode = false;
   problemResults.fill(null);
   roundComplete = false;
   scoringClasses.forEach((className) => progressTrack.classList.remove(className));
@@ -365,6 +414,7 @@ previewButton.addEventListener('click', () => {
   playCorrectAnswerReward(true);
 });
 resetButton.addEventListener('click', resetPrototype);
+breakIntoStepsButton.addEventListener('click', enterScaffoldedMode);
 
 document.addEventListener('keydown', (event) => {
   if (event.key.toLowerCase() === 'r' && (event.metaKey || event.ctrlKey)) {
