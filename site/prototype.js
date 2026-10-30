@@ -58,6 +58,7 @@ const potentialRevealDelayMs = 900;
 const firstRewardDurationMs = 2300;
 const bonusRewardDurationMs = 2800;
 const missedRewardDurationMs = 2200;
+const finalMissFadeDelayMs = 1400;
 const problemResults = Array(problems.length).fill(null);
 let currentProblemIndex = 0;
 let firstTrySolveCount = 0;
@@ -65,6 +66,7 @@ let attemptCount = 0;
 let awaitingNextProblem = false;
 let roundComplete = false;
 let rewardTimeout;
+let finalMissFadeTimeout;
 let potentialRevealTimeout;
 
 function hideEpicFinale() {
@@ -119,6 +121,7 @@ function showEpicFinale(showSpareBallBonus = false) {
 
 function clearReward() {
   window.clearTimeout(rewardTimeout);
+  window.clearTimeout(finalMissFadeTimeout);
   rewardLayer.classList.remove('is-playing');
   rewardLayer.classList.remove('is-missed');
   clearShotTarget();
@@ -231,7 +234,10 @@ function playWrongAnswerReward(isFinalAttempt) {
   setShotTarget(true, !isFinalAttempt);
 
   if (isFinalAttempt) {
-    syncPotentialHoops();
+    finalMissFadeTimeout = window.setTimeout(
+      syncPotentialHoops,
+      finalMissFadeDelayMs,
+    );
   }
   void rewardLayer.offsetWidth;
   rewardLayer.classList.add('is-missed');
